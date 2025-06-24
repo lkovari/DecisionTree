@@ -5,7 +5,7 @@ using DecisionTreeLib.Request;
 
 namespace DecisionTreeLib.Processing;
 
-public class Processor<T> : IProcessor<T>
+public class Processor<T>
 {
     private readonly IAdapter<T> _adapter;
 
@@ -16,6 +16,7 @@ public class Processor<T> : IProcessor<T>
 
     public void Process(INode<T> node, IRequest<T> request)
     {
+        node.ResultMap.Clear();
         switch (node)
         {
             case ProcessNode<T> processNode:
@@ -35,7 +36,7 @@ public class Processor<T> : IProcessor<T>
                 var result = new DecisionTreeLib.Result.Result<T> { Value = resultValue };
                 var response = new DecisionTreeLib.Response.Response<T> { Result = result };
                 node.ResultMap[node.NodeId] = response;
-                request.Operands[processNode.Title] = new DecisionTreeLib.Data.Data<T> { Value = resultValue };
+                request.Operands[processNode.Title] = new DecisionTreeLib.Data.Data<T>(resultValue);
                 _adapter.Write($"{processNode.Title} = {resultValue}");
 
                 if (processNode.NextNode != null)
@@ -50,7 +51,10 @@ public class Processor<T> : IProcessor<T>
                     RelationType.Equal => value == (dynamic)decisionNode.CompareValue,
                     RelationType.GreaterThan => value > (dynamic)decisionNode.CompareValue,
                     RelationType.LessThan => value < (dynamic)decisionNode.CompareValue,
-                    _ => false
+                    RelationType.GreaterThanOrEqual => value >= (dynamic)decisionNode.CompareValue,
+                    RelationType.LessThanOrEqual => value <= (dynamic)decisionNode.CompareValue,
+                    RelationType.NotEqual => value != (dynamic)decisionNode.CompareValue,
+                    _ => throw new NotImplementedException()
                 };
 
                 var result = new DecisionTreeLib.Result.Result<T> { Value = value };

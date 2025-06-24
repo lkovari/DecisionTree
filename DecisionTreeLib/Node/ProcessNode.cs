@@ -1,22 +1,16 @@
 using DecisionTreeLib.Enums;
-using DecisionTreeLib.Node;
 using DecisionTreeLib.Response;
 
-public class ProcessNode<T> : IProcessNode<T>
+namespace DecisionTreeLib.Node;
+
+public class ProcessNode<T>(string title, string leftKey, string rightKey, OperatorType op, INode<T> nextNode)
+    : IProcessNode<T>
 {
     public Guid NodeId { get; set; } = Guid.NewGuid();
-    public string Title { get; set; }
-    public string LeftOperandKey { get; }
-    public string RightOperandKey { get; }
-    public OperatorType Operator { get; }
-    public INode<T> NextNode { get; set; }
+    public string Title { get; set; } = title;
+    public string LeftOperandKey { get; } = leftKey;
+    public string RightOperandKey { get; } = rightKey;
+    public OperatorType Operator { get; } = op;
+    public INode<T> NextNode { get; set; } = nextNode;
     public Dictionary<Guid, IResponse<T>> ResultMap { get; set; } = new();
-
-    public ProcessNode(string title, string leftKey, string rightKey, OperatorType op)
-    {
-        Title = title;
-        LeftOperandKey = leftKey;
-        RightOperandKey = rightKey;
-        Operator = op;
-    }
 }
