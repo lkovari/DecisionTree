@@ -9,7 +9,6 @@ using DecisionTreeLib.Request;
 
 Console.WriteLine("Hello, Decision Tree Usage Example!");
 
-// Bemeneti adatok
 var request = new Request<double>
 {
     Operands =
@@ -42,6 +41,5 @@ var divideNode = new ProcessNode<double>("DivResult", "C", "D", OperatorType.Div
 var subtractNode = new ProcessNode<double>("SubResult", "A", "B", OperatorType.Subtract,
     divideNode);
 
-// Feldolgozás indítása
 var processor = new Processor<double>(adapter);
 processor.Process(subtractNode, request);

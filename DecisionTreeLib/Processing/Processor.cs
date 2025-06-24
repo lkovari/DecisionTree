@@ -2,7 +2,6 @@ using DecisionTreeLib.Adapters;
 using DecisionTreeLib.Enums;
 using DecisionTreeLib.Node;
 using DecisionTreeLib.Request;
-using DecisionTreeLib.Response;
 
 namespace DecisionTreeLib.Processing;
 

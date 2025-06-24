@@ -18,7 +18,7 @@ public class EndNode<T> : INode<T>
 
     public IResponse<T> Process(IRequest<T> request)
     {
-        Console.WriteLine("Vége a fának.");
+        Console.WriteLine("End of Processing.");
         return  new Response<T>
         {
             Title = "EndNode",

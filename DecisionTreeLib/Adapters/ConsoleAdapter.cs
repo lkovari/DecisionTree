@@ -1,5 +1,3 @@
-using DecisionTreeLib.Data;
-using DecisionTreeLib.Response;
 
 namespace DecisionTreeLib.Adapters;
 
