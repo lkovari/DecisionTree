@@ -1,11 +1,9 @@
 using DecisionTreeLib.Enums;
-using DecisionTreeLib.Relation;
-using DecisionTreeLib.Request;
 using DecisionTreeLib.Response;
 
 namespace DecisionTreeLib.Node;
 
-public class DecisionNode<T> : INode<T>
+public class DecisionNode<T> : IDecisionNode<T>
 {
     public Guid NodeId { get; set; } = Guid.NewGuid();
     public string Title { get; set; }

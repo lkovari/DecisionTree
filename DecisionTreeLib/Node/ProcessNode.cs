@@ -1,9 +1,8 @@
 using DecisionTreeLib.Enums;
 using DecisionTreeLib.Node;
-using DecisionTreeLib.Operator;
 using DecisionTreeLib.Response;
 
-public class ProcessNode<T> : INode<T>
+public class ProcessNode<T> : IProcessNode<T>
 {
     public Guid NodeId { get; set; } = Guid.NewGuid();
     public string Title { get; set; }
