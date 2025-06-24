@@ -2,6 +2,7 @@ using DecisionTreeLib.Adapters;
 using DecisionTreeLib.Enums;
 using DecisionTreeLib.Node;
 using DecisionTreeLib.Request;
+using DecisionTreeLib.Response;
 
 namespace DecisionTreeLib.Processing;
 
@@ -16,7 +17,6 @@ public class Processor<T>
 
     public void Process(INode<T> node, IRequest<T> request)
     {
-        node.ResultMap.Clear();
         switch (node)
         {
             case ProcessNode<T> processNode:
@@ -35,7 +35,17 @@ public class Processor<T>
 
                 var result = new DecisionTreeLib.Result.Result<T> { Value = resultValue };
                 var response = new DecisionTreeLib.Response.Response<T> { Result = result };
-                node.ResultMap[node.NodeId] = response;
+
+                if (!processNode.TypedResultMaps.TryGetValue(typeof(T), out var mapObj))
+                {
+                    // mapObj = new Dictionary<Guid, IResponse<T>>();
+                    // processNode.TypedResultMaps[typeof(T)] = mapObj;
+                    processNode.AddResult(processNode.NodeId, response);
+                }
+
+                //var map = (Dictionary<Guid, IResponse<T>>)mapObj;
+                //map[processNode.NodeId] = response;
+
                 request.Operands[processNode.Title] = new DecisionTreeLib.Data.Data<T>(resultValue);
                 _adapter.Write($"{processNode.Title} = {resultValue}");
 
@@ -54,12 +64,20 @@ public class Processor<T>
                     RelationType.GreaterThanOrEqual => value >= (dynamic)decisionNode.CompareValue,
                     RelationType.LessThanOrEqual => value <= (dynamic)decisionNode.CompareValue,
                     RelationType.NotEqual => value != (dynamic)decisionNode.CompareValue,
-                    _ => throw new NotImplementedException()
+                    _ => throw new ArgumentOutOfRangeException(nameof(decisionNode.RelationType))
                 };
 
                 var result = new DecisionTreeLib.Result.Result<T> { Value = value };
                 var response = new DecisionTreeLib.Response.Response<T> { Result = result };
-                node.ResultMap[node.NodeId] = response;
+                if (!decisionNode.TypedResultMaps.TryGetValue(typeof(T), out var mapObj))
+                {
+                    //mapObj = new Dictionary<Guid, IResponse<T>>();
+                    //decisionNode.TypedResultMaps[typeof(T)] = mapObj;
+                    decisionNode.AddResult(decisionNode.NodeId, response);
+                }
+
+                //var map = (Dictionary<Guid, IResponse<T>>)mapObj;
+                //map[decisionNode.NodeId] = response;
                 _adapter.Write($"{decisionNode.Title}: {condition}");
 
                 if (condition && decisionNode.YesNextNode != null)
@@ -68,6 +86,11 @@ public class Processor<T>
                     Process(decisionNode.NoNextNode, request);
                 break;
             }
+            case EndNode<T> endNode:
+                Console.WriteLine($"End of Processing: {endNode.Title}");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(node), $"Unknown Node type: {node.GetType().Name}");
         }
     }
 }

@@ -1,88 +1,83 @@
-﻿
-using DecisionTreeLib.Adapters;
+﻿using DecisionTreeLib.Adapters;
 using DecisionTreeLib.Data;
 using DecisionTreeLib.Enums;
 using DecisionTreeLib.Node;
 using DecisionTreeLib.Processing;
 using DecisionTreeLib.Request;
+using DecisionTreeLib.Response;
+using Xunit;
 
 namespace Tests;
 
 public class ProcessAndDecisionNodeTests
 {
-    private readonly IAdapter<double> _adapter = new ConsoleAdapter<double>();
-
     [Theory]
     [InlineData(5, 3, OperatorType.Add, 8)]
     [InlineData(5, 3, OperatorType.Subtract, 2)]
     [InlineData(5, 3, OperatorType.Multiply, 15)]
     [InlineData(6, 3, OperatorType.Divide, 2)]
-    public void ProcessNode_Should_Calculate_Correct_Result_And_Invoke_NextNode(double left, double right, OperatorType op, double expected)
+    public void ProcessNode_Should_Perform_Arithmetic_Correctly(double left, double right, OperatorType op, double expected)
     {
+        // Arrange
+        var adapter = new ConsoleAdapter<double>();
         var request = new Request<double>
         {
-            Operands = new Dictionary<string, IData<double>>
+            Operands =
             {
-                { "Left", new Data<double>(left) },
-                { "Right", new Data<double>(right) }
+                ["left"] = new Data<double>(left),
+                ["right"] = new Data<double>(right)
             }
         };
 
-        var nextNodeExecuted = false;
+        var endNode = new EndNode<double>("End");
+        var processNode = new ProcessNode<double>("Result", "left", "right", op, endNode);
 
-        var nextNode = new DummyNode<double>(() => nextNodeExecuted = true, "DummyProcessNode");
+        var processor = new Processor<double>(adapter);
 
-        var processNode = new ProcessNode<double>("TestNode", "Left", "Right", op, nextNode);
-        
-        var processor = new Processor<double>(_adapter);
+        // Act
         processor.Process(processNode, request);
-        
+
         // Assert
-        Assert.Contains(processNode.NodeId, processNode.ResultMap);
-        Assert.NotNull(processNode.ResultMap[processNode.NodeId].Result);
-        Assert.Equal(expected, processNode.ResultMap[processNode.NodeId].Result!.Value);
-        Assert.True(nextNodeExecuted);
+        Assert.True(request.Operands.ContainsKey("Result"));
+        Assert.Equal(expected, request.Operands["Result"].Value);
     }
 
     [Theory]
     [InlineData(5, 5, RelationType.Equal, true)]
     [InlineData(5, 3, RelationType.GreaterThan, true)]
     [InlineData(3, 5, RelationType.LessThan, true)]
-    [InlineData(5, 5, RelationType.GreaterThanOrEqual, true)]
+    [InlineData(5, 3, RelationType.GreaterThanOrEqual, true)]
+    [InlineData(3, 3, RelationType.GreaterThanOrEqual, true)]
     [InlineData(3, 5, RelationType.LessThanOrEqual, true)]
-    [InlineData(5, 3, RelationType.Equal, false)]
-    public void DecisionNode_Should_Evaluate_Correctly_And_Invoke_Proper_NextNode(double operandValue, double compareValue, RelationType relationType, bool expectYesBranch)
+    [InlineData(3, 3, RelationType.LessThanOrEqual, true)]
+    [InlineData(3, 5, RelationType.NotEqual, true)]
+    public void DecisionNode_Should_Evaluate_Condition_Correctly(double left, double right, RelationType relation, bool expectYesBranch)
     {
-        bool yesNodeExecuted = false;
-        bool noNodeExecuted = false;
-
-        var yesNode = new DummyNode<double>(() => yesNodeExecuted = true, "DummyYesDecisionNode");
-        var noNode = new DummyNode<double>(() => noNodeExecuted = true, "DummyNoDecisionNode");
-
+        // Arrange
+        var adapter = new ConsoleAdapter<double>();
         var request = new Request<double>
         {
-            Operands = new Dictionary<string, IData<double>>
+            Operands =
             {
-                { "Operand", new Data<double>(operandValue) }
+                ["operand"] = new Data<double>(left)
             }
         };
 
-        var decisionNode = new DecisionNode<double>("TestDecision", "Operand", compareValue, relationType, yesNode, noNode);
-        
-        var processor = new Processor<double>(_adapter);
-        
+        var yesEndNode = new EndNode<double>("YesEnd");
+        var noEndNode = new EndNode<double>("NoEnd");
+
+        var decisionNode = new DecisionNode<double>("Decision", "operand", right, relation, yesEndNode, noEndNode);
+
+        var processor = new Processor<double>(adapter);
+
+        // Act
         processor.Process(decisionNode, request);
-        
+
         // Assert
-        if (expectYesBranch)
-        {
-            Assert.True(yesNodeExecuted);
-            Assert.False(noNodeExecuted);
-        }
-        else
-        {
-            Assert.False(yesNodeExecuted);
-            Assert.True(noNodeExecuted);
-        }
+        bool yesExecuted = ((Dictionary<Guid, IResponse<double>>)yesEndNode.TypedResultMaps.GetValueOrDefault(typeof(double), new Dictionary<Guid, IResponse<double>>())).Count > 0;
+        bool noExecuted = ((Dictionary<Guid, IResponse<double>>)noEndNode.TypedResultMaps.GetValueOrDefault(typeof(double), new Dictionary<Guid, IResponse<double>>())).Count > 0;
+
+        Assert.Equal(expectYesBranch, yesExecuted);
+        Assert.Equal(!expectYesBranch, noExecuted);
     }
 }

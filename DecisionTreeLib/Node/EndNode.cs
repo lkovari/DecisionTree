@@ -1,14 +1,31 @@
-using DecisionTreeLib.Enums;
+using DecisionTreeLib.Request;
 using DecisionTreeLib.Response;
 
 namespace DecisionTreeLib.Node;
 
-public class ProcessNode<T>(string title, string leftKey, string rightKey, OperatorType op, INode<T> nextNode)
-    : IProcessNode<T>
+public class EndNode<T> : INode<T>
 {
-    public Guid NodeId { get; set; } = Guid.NewGuid();
-    public string Title { get; set; } = title;
+    public Dictionary<Guid, IResponse<T>> ResultMap { get; set; } = new();
+    public Guid NodeId { get; set; }
+    public string Title { get; set; }
     public Dictionary<Type, object> TypedResultMaps { get; } = new();
+
+    public EndNode(string title)
+    {
+        Title = title;
+        NodeId = Guid.NewGuid();
+    }
+
+    public IResponse<T> Process(IRequest<T> request)
+    {
+        Console.WriteLine("Vége a fának.");
+        return  new Response<T>
+        {
+            Title = "EndNode",
+            Result = null
+        };
+    }
+
     public void AddResult<TData>(Guid nodeId, IResponse<TData> response)
     {
         if (!TypedResultMaps.TryGetValue(typeof(TData), out var mapObj))
@@ -16,7 +33,6 @@ public class ProcessNode<T>(string title, string leftKey, string rightKey, Opera
             mapObj = new Dictionary<Guid, IResponse<TData>>();
             TypedResultMaps[typeof(TData)] = mapObj;
         }
-
         var map = (Dictionary<Guid, IResponse<TData>>)mapObj;
         map[nodeId] = response;
     }
@@ -24,19 +40,11 @@ public class ProcessNode<T>(string title, string leftKey, string rightKey, Opera
     public bool TryGetResult<TData>(Guid nodeId, out IResponse<TData>? response)
     {
         response = default;
-
         if (TypedResultMaps.TryGetValue(typeof(TData), out var mapObj))
         {
             var map = (Dictionary<Guid, IResponse<TData>>)mapObj;
             return map.TryGetValue(nodeId, out response);
         }
-
         return false;
     }
-
-    public string LeftOperandKey { get; } = leftKey;
-    public string RightOperandKey { get; } = rightKey;
-    public OperatorType Operator { get; } = op;
-    public INode<T> NextNode { get; set; } = nextNode;
-    public Dictionary<Guid, IResponse<T>> ResultMap { get; set; }
 }
