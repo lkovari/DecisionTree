@@ -1,0 +1,61 @@
+# Build
+bin/
+obj/
+out/
+
+# Rider IDE
+.idea/
+*.sln.iml
+
+# User-specific
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Build results
+*.dll
+*.exe
+*.app
+*.pdb
+
+# NuGet
+project.assets.json
+project.nuget.cache
+project.packagespec.json
+*.nupkg
+*.snupkg
+*.nuspec
+
+# Rider project restore
+*.csproj.nuget.dgspec.json
+rider.project.restore.info
+
+# Auto-generated AssemblyInfo
+*.AssemblyInfo.cs
+*.AssemblyInfoInputs.cache
+
+# Logs
+*.log
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+
+# DotCover
+.idea/.dotCover
+
+# Other
+*.orig
+*.bak
+
+# Optional: ignore global config files if not shared intentionally
+Directory.Build.props
+Directory.Build.targets
+
+# Optional: ignore publish output
+publish/
