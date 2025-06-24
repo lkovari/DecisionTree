@@ -1,8 +1,9 @@
 using DecisionTreeLib.Data;
+using DecisionTreeLib.Response;
 
 namespace DecisionTreeLib.Adapters;
 
 public class ConsoleAdapter<T> : IAdapter<T>
 {
-    public void Show(IData<T> data) => Console.WriteLine($"Log result: {data.Value}");
+    public void Write(string message) => Console.WriteLine(message);
 }
