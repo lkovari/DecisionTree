@@ -1,61 +1,40 @@
-# Build
-bin/
-obj/
-out/
+# Build output
+**/bin/
+**/obj/
 
-# Rider IDE
+# Rider IDE files
 .idea/
 *.sln.iml
 
-# User-specific
+# User-specific files
 *.user
-*.userosscache
 *.suo
-*.sln.docstates
+*.userprefs
 
-# VS Code
+# NuGet cache
+*.nupkg
+*.nuget.cache
+
+# VSCode (ha használnád)
 .vscode/
 
-# Build results
-*.dll
-*.exe
-*.app
-*.pdb
+# MacOS system files
+.DS_Store
 
-# NuGet
-project.assets.json
-project.nuget.cache
-project.packagespec.json
-*.nupkg
-*.snupkg
-*.nuspec
+# Rider project restore információk
+*.restore.info
 
-# Rider project restore
-*.csproj.nuget.dgspec.json
-rider.project.restore.info
-
-# Auto-generated AssemblyInfo
+# Assembly info generált fájlok
 *.AssemblyInfo.cs
 *.AssemblyInfoInputs.cache
 
-# Logs
-*.log
+# Project.assets.json
+project.assets.json
+**/project.assets.json
 
-# Test results
-TestResults/
-*.trx
-*.coverage
+# Packagespec json
+project.packagespec.json
+**/project.packagespec.json
 
-# DotCover
-.idea/.dotCover
-
-# Other
-*.orig
-*.bak
-
-# Optional: ignore global config files if not shared intentionally
-Directory.Build.props
-Directory.Build.targets
-
-# Optional: ignore publish output
-publish/
+# Debug cache
+*.cache
