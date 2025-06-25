@@ -1,10 +1,12 @@
 ﻿using DecisionTreeLib.Adapters;
 using DecisionTreeLib.Data;
 using DecisionTreeLib.Enums;
+using DecisionTreeLib.Helper;
 using DecisionTreeLib.Node;
 using DecisionTreeLib.Processing;
 using DecisionTreeLib.Request;
 using DecisionTreeLib.Response;
+using DecisionTreeLib.Result;
 using Xunit;
 
 namespace Tests;
@@ -18,7 +20,7 @@ public class ProcessAndDecisionNodeTests
     [InlineData(6, 3, OperatorType.Divide, 2)]
     public void ProcessNode_Should_Perform_Arithmetic_Correctly(double left, double right, OperatorType op, double expected)
     {
-        // Arrange
+        ResponseStorageHelper.ClearAll();
         var adapter = new ConsoleAdapter<double>();
         var request = new Request<double>
         {
@@ -29,15 +31,13 @@ public class ProcessAndDecisionNodeTests
             }
         };
 
-        var endNode = new EndNode<double>("End");
+        var endNode = new EndNode<double>();
         var processNode = new ProcessNode<double>("Result", "left", "right", op, endNode);
 
         var processor = new Processor<double>(adapter);
-
-        // Act
+        
         processor.Process(processNode, request);
-
-        // Assert
+        
         Assert.True(request.Operands.ContainsKey("Result"));
         Assert.Equal(expected, request.Operands["Result"].Value);
     }
@@ -51,33 +51,35 @@ public class ProcessAndDecisionNodeTests
     [InlineData(3, 5, RelationType.LessThanOrEqual, true)]
     [InlineData(3, 3, RelationType.LessThanOrEqual, true)]
     [InlineData(3, 5, RelationType.NotEqual, true)]
-    public void DecisionNode_Should_Evaluate_Condition_Correctly(double left, double right, RelationType relation, bool expectYesBranch)
+    public void DecisionNode_Should_Evaluate_Condition_Correctly(double left, double right, RelationType relation, bool expectedYes)
     {
-        // Arrange
-        var adapter = new ConsoleAdapter<double>();
+        ResponseStorageHelper.ClearAll();
+
         var request = new Request<double>
         {
-            Operands =
-            {
-                ["operand"] = new Data<double>(left)
-            }
+            Operands = { ["left"] = new Data<double>(left) }
         };
 
-        var yesEndNode = new EndNode<double>("YesEnd");
-        var noEndNode = new EndNode<double>("NoEnd");
+        var yesEndNode = new EndNode<double> { Title = "YesEnd" };
+        var noEndNode = new EndNode<double> { Title = "NoEnd" };
 
-        var decisionNode = new DecisionNode<double>("Decision", "operand", right, relation, yesEndNode, noEndNode);
+        var decisionNode = new DecisionNode<double>(
+            title: "Decision",
+            operandKey: "left",
+            compareValue: right,
+            relationType: relation,
+            yesNextNode: yesEndNode,
+            noNextNode: noEndNode
+        );
 
-        var processor = new Processor<double>(adapter);
-
-        // Act
+        var processor = new Processor<double>(new ConsoleAdapter<double>());
+        
         processor.Process(decisionNode, request);
+        
+        bool yesExecuted = ResponseStorageHelper.GetResultMap<string>()?.ContainsKey(yesEndNode.NodeId) == true;
+        bool noExecuted = ResponseStorageHelper.GetResultMap<string>()?.ContainsKey(noEndNode.NodeId) == true;
 
-        // Assert
-        bool yesExecuted = ((Dictionary<Guid, IResponse<double>>)yesEndNode.TypedResultMaps.GetValueOrDefault(typeof(double), new Dictionary<Guid, IResponse<double>>())).Count > 0;
-        bool noExecuted = ((Dictionary<Guid, IResponse<double>>)noEndNode.TypedResultMaps.GetValueOrDefault(typeof(double), new Dictionary<Guid, IResponse<double>>())).Count > 0;
-
-        Assert.Equal(expectYesBranch, yesExecuted);
-        Assert.Equal(!expectYesBranch, noExecuted);
+        Assert.Equal(expectedYes, yesExecuted);
+        Assert.Equal(!expectedYes, noExecuted);
     }
 }

@@ -8,32 +8,6 @@ public class ProcessNode<T>(string title, string leftKey, string rightKey, Opera
 {
     public Guid NodeId { get; set; } = Guid.NewGuid();
     public string Title { get; set; } = title;
-    public Dictionary<Type, object> TypedResultMaps { get; } = new();
-    public void AddResult<TData>(Guid nodeId, IResponse<TData> response)
-    {
-        if (!TypedResultMaps.TryGetValue(typeof(TData), out var mapObj))
-        {
-            mapObj = new Dictionary<Guid, IResponse<TData>>();
-            TypedResultMaps[typeof(TData)] = mapObj;
-        }
-
-        var map = (Dictionary<Guid, IResponse<TData>>)mapObj;
-        map[nodeId] = response;
-    }
-
-    public bool TryGetResult<TData>(Guid nodeId, out IResponse<TData>? response)
-    {
-        response = default;
-
-        if (TypedResultMaps.TryGetValue(typeof(TData), out var mapObj))
-        {
-            var map = (Dictionary<Guid, IResponse<TData>>)mapObj;
-            return map.TryGetValue(nodeId, out response);
-        }
-
-        return false;
-    }
-
     public string LeftOperandKey { get; } = leftKey;
     public string RightOperandKey { get; } = rightKey;
     public OperatorType Operator { get; } = op;

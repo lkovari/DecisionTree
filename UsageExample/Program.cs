@@ -23,8 +23,8 @@ var request = new Request<double>
 
 var adapter = new ConsoleAdapter<double>();
 
-var yesEndNode = new EndNode<double>("YesEnd");
-var noEndNode = new EndNode<double>("NoEnd");
+var yesEndNode = new EndNode<double>();
+var noEndNode = new EndNode<double>();
 
 var decisionNode = new DecisionNode<double>("Is300", "FinalResult", 300, RelationType.Equal,
     yesEndNode, noEndNode);
