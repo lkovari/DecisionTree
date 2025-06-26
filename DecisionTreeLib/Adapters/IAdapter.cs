@@ -1,7 +1,7 @@
 
 namespace DecisionTreeLib.Adapters;
 
-public interface IAdapter<T>
+public interface IAdapter
 {
     void Write(string message);
 }

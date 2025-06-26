@@ -1,7 +1,7 @@
 
 namespace DecisionTreeLib.Adapters;
 
-public class ConsoleAdapter<T> : IAdapter<T>
+public class ConsoleAdapter : IAdapter
 {
     public void Write(string message) => Console.WriteLine(message);
 }

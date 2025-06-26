@@ -21,7 +21,7 @@ var request = new Request<double>
     }
 };
 
-var adapter = new ConsoleAdapter<double>();
+var adapter = new ConsoleAdapter();
 
 var yesEndNode = new EndNode<double>();
 var noEndNode = new EndNode<double>();
@@ -41,5 +41,5 @@ var divideNode = new ProcessNode<double>("DivResult", "C", "D", OperatorType.Div
 var subtractNode = new ProcessNode<double>("SubResult", "A", "B", OperatorType.Subtract,
     divideNode);
 
-var processor = new Processor<double>(adapter);
-processor.Process(subtractNode, request);
+var processor = new DecisionTreeEvaluator<double>(adapter);
+processor.Evaluate(subtractNode, request);

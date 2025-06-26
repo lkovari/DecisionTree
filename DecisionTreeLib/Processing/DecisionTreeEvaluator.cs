@@ -8,16 +8,16 @@ using DecisionTreeLib.Result;
 
 namespace DecisionTreeLib.Processing;
 
-public class Processor<T>
+public class DecisionTreeEvaluator<T>
 {
-    private readonly IAdapter<T> _adapter;
+    private readonly IAdapter _adapter;
 
-    public Processor(IAdapter<T> adapter)
+    public DecisionTreeEvaluator(IAdapter adapter)
     {
         _adapter = adapter;
     }
 
-    public void Process(INode<T> node, IRequest<T> request)
+    public void Evaluate(INode<T> node, IRequest<T> request)
     {
         switch (node)
         {
@@ -44,7 +44,7 @@ public class Processor<T>
                 _adapter.Write($"{processNode.Title} = {resultValue}");
 
                 if (processNode.NextNode != null)
-                    Process(processNode.NextNode, request);
+                    Evaluate(processNode.NextNode, request);
                 break;
             }
             case DecisionNode<T> decisionNode:
@@ -69,9 +69,9 @@ public class Processor<T>
                 _adapter.Write($"{decisionNode.Title}: {condition}");
 
                 if (condition && decisionNode.YesNextNode != null)
-                    Process(decisionNode.YesNextNode, request);
+                    Evaluate(decisionNode.YesNextNode, request);
                 else if (!condition && decisionNode.NoNextNode != null)
-                    Process(decisionNode.NoNextNode, request);
+                    Evaluate(decisionNode.NoNextNode, request);
                 break;
             }
             case EndNode<T> endNode:

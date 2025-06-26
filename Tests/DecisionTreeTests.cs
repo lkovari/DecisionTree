@@ -21,7 +21,7 @@ public class ProcessAndDecisionNodeTests
     public void ProcessNode_Should_Perform_Arithmetic_Correctly(double left, double right, OperatorType op, double expected)
     {
         ResponseStorageHelper.ClearAll();
-        var adapter = new ConsoleAdapter<double>();
+        var adapter = new ConsoleAdapter();
         var request = new Request<double>
         {
             Operands =
@@ -34,9 +34,9 @@ public class ProcessAndDecisionNodeTests
         var endNode = new EndNode<double>();
         var processNode = new ProcessNode<double>("Result", "left", "right", op, endNode);
 
-        var processor = new Processor<double>(adapter);
+        var processor = new DecisionTreeEvaluator<double>(adapter);
         
-        processor.Process(processNode, request);
+        processor.Evaluate(processNode, request);
         
         Assert.True(request.Operands.ContainsKey("Result"));
         Assert.Equal(expected, request.Operands["Result"].Value);
@@ -72,9 +72,9 @@ public class ProcessAndDecisionNodeTests
             noNextNode: noEndNode
         );
 
-        var processor = new Processor<double>(new ConsoleAdapter<double>());
+        var processor = new DecisionTreeEvaluator<double>(new ConsoleAdapter());
         
-        processor.Process(decisionNode, request);
+        processor.Evaluate(decisionNode, request);
         
         bool yesExecuted = ResponseStorageHelper.GetResultMap<string>()?.ContainsKey(yesEndNode.NodeId) == true;
         bool noExecuted = ResponseStorageHelper.GetResultMap<string>()?.ContainsKey(noEndNode.NodeId) == true;
