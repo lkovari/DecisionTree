@@ -17,6 +17,11 @@ public class DecisionTreeEvaluator<T>
         _adapter = adapter;
     }
 
+    public void Initialize()
+    {
+        ResponseStorageHelper.ClearAll();
+    }
+    
     public void Evaluate(INode<T> node, IRequest<T> request)
     {
         switch (node)

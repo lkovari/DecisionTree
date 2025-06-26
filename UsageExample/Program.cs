@@ -26,7 +26,7 @@ var adapter = new ConsoleAdapter();
 var yesEndNode = new EndNode<double>();
 var noEndNode = new EndNode<double>();
 
-var decisionNode = new DecisionNode<double>("Is300", "FinalResult", 300, RelationType.Equal,
+var decisionNode = new DecisionNode<double>("Is the result equals 300", "FinalResult", 300, RelationType.Equal,
     yesEndNode, noEndNode);
 
 var multiplyFinalNode = new ProcessNode<double>("FinalResult", "SubResult", "MulInnerResult", OperatorType.Multiply,
@@ -41,5 +41,6 @@ var divideNode = new ProcessNode<double>("DivResult", "C", "D", OperatorType.Div
 var subtractNode = new ProcessNode<double>("SubResult", "A", "B", OperatorType.Subtract,
     divideNode);
 
-var processor = new DecisionTreeEvaluator<double>(adapter);
-processor.Evaluate(subtractNode, request);
+var decisionTreeEvaluator = new DecisionTreeEvaluator<double>(adapter);
+decisionTreeEvaluator.Initialize();
+decisionTreeEvaluator.Evaluate(subtractNode, request);
