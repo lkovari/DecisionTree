@@ -1,40 +1,17 @@
 # Build output
-**/bin/
-**/obj/
+bin/
+obj/
 
-# Rider IDE files
+# Rider specific
 .idea/
 *.sln.iml
 
-# User-specific files
+# NuGet
+*.nupkg
+*.snupkg
+project.nuget.cache
+
+# Other common
 *.user
 *.suo
-*.userprefs
-
-# NuGet cache
-*.nupkg
-*.nuget.cache
-
-# VSCode (ha használnád)
-.vscode/
-
-# MacOS system files
-.DS_Store
-
-# Rider project restore információk
-*.restore.info
-
-# Assembly info generált fájlok
-*.AssemblyInfo.cs
-*.AssemblyInfoInputs.cache
-
-# Project.assets.json
-project.assets.json
-**/project.assets.json
-
-# Packagespec json
-project.packagespec.json
-**/project.packagespec.json
-
-# Debug cache
-*.cache
+*.vs/
