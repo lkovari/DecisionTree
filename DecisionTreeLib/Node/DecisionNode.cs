@@ -1,23 +1,23 @@
-using DecisionTreeLib.Enums;
+using DecisionTreeLib.Request;
 using DecisionTreeLib.Response;
 
 namespace DecisionTreeLib.Node;
 
-public class DecisionNode<T>(
-    string title,
-    string operandKey,
-    T compareValue,
-    RelationType relationType,
-    INode<T>? yesNextNode,
-    INode<T>? noNextNode)
-    : IDecisionNode<T>
+public class DecisionNode<TLeft, TRight, TResult> : IDecisionNode<TLeft, TRight, TResult>
 {
-    public Guid NodeId { get; set; } = Guid.NewGuid();
-    public string Title { get; set; } = title;
-    public string OperandKey { get; } = operandKey;
-    public T CompareValue { get; } = compareValue;
-    public RelationType RelationType { get; } = relationType;
-    public INode<T>? YesNextNode { get; set; } = yesNextNode;
-    public INode<T>? NoNextNode { get; set; } = noNextNode;
-    public Dictionary<Guid, IResponse<T>> ResultMap { get; set; }
+    public Guid NodeId { get; } = Guid.NewGuid();
+    public string Title { get; }
+    public Dictionary<Guid, IResponse<TResult>> ResultMap { get; set; } = new();
+
+    public IDecisionRequest<TLeft, TRight> Request { get; }
+    public INode<TLeft, TRight, TResult> YesNextNode { get; }
+    public INode<TLeft, TRight, TResult> NoNextNode { get; }
+
+    public DecisionNode(string title, IDecisionRequest<TLeft, TRight> request, INode<TLeft, TRight, TResult> yesNextNode, INode<TLeft, TRight, TResult> noNextNode)
+    {
+        Title = title;
+        Request = request;
+        YesNextNode = yesNextNode;
+        NoNextNode = noNextNode;
+    }
 }

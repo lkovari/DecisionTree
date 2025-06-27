@@ -1,20 +1,18 @@
 ﻿using DecisionTreeLib.Adapters;
 using DecisionTreeLib.Data;
 using DecisionTreeLib.Enums;
-using DecisionTreeLib.Helper;
 using DecisionTreeLib.Node;
 using DecisionTreeLib.Processing;
 using DecisionTreeLib.Request;
 using DecisionTreeLib.Response;
-using DecisionTreeLib.Result;
 using Xunit;
 
 namespace Tests;
 
 public class ProcessAndDecisionNodeTests
 {
-    private readonly IAdapter consoleAdapter = new ConsoleAdapter();
-    
+    private readonly IAdapter _adapter = new ConsoleAdapter();
+
     [Theory]
     [InlineData(5, 3, OperatorType.Add, 8)]
     [InlineData(5, 3, OperatorType.Subtract, 2)]
@@ -22,24 +20,21 @@ public class ProcessAndDecisionNodeTests
     [InlineData(6, 3, OperatorType.Divide, 2)]
     public void ProcessNode_Should_Perform_Arithmetic_Correctly(double left, double right, OperatorType op, double expected)
     {
-        var request = new Request<double>
-        {
-            Operands =
-            {
-                ["left"] = new Data<double>(left),
-                ["right"] = new Data<double>(right)
-            }
-        };
+        var request = new OperationRequest<double, double>(
+            new Data<double>(left),
+            new Data<double>(right),
+            op
+        );
 
-        var endNode = new EndNode<double>();
-        var processNode = new ProcessNode<double>("Result", "left", "right", op, endNode);
+        var endNode = new EndNode<double, double, double>("End", new Response<double> { Title = "End" });
 
-        var decisionTreeEvaluator = new DecisionTreeEvaluator<double>(consoleAdapter);
-        decisionTreeEvaluator.Initialize();
-        decisionTreeEvaluator.Evaluate(processNode, request);
-        
-        Assert.True(request.Operands.ContainsKey("Result"));
-        Assert.Equal(expected, request.Operands["Result"].Value);
+        var processNode = new ProcessNode<double, double, double>("Process", request, endNode);
+
+        var evaluator = new DecisionTreeEvaluator(_adapter);
+        var response = evaluator.Evaluate(processNode);
+
+        Assert.NotNull(response?.Result);
+        Assert.Equal(expected, response.Result!.Value);
     }
 
     [Theory]
@@ -53,31 +48,37 @@ public class ProcessAndDecisionNodeTests
     [InlineData(3, 5, RelationType.NotEqual, true)]
     public void DecisionNode_Should_Evaluate_Condition_Correctly(double left, double right, RelationType relation, bool expectedYes)
     {
-        var request = new Request<double>
-        {
-            Operands = { ["left"] = new Data<double>(left) }
-        };
-
-        var yesEndNode = new EndNode<double> { Title = "YesEnd" };
-        var noEndNode = new EndNode<double> { Title = "NoEnd" };
-
-        var decisionNode = new DecisionNode<double>(
-            title: "Decision",
-            operandKey: "left",
-            compareValue: right,
-            relationType: relation,
-            yesNextNode: yesEndNode,
-            noNextNode: noEndNode
+        var request = new DecisionRequest<double, double>(
+            new Data<double>(left),
+            new Data<double>(right),
+            relation
         );
 
-        var decisionTreeEvaluator = new DecisionTreeEvaluator<double>(consoleAdapter);
-        decisionTreeEvaluator.Initialize();
-        decisionTreeEvaluator.Evaluate(decisionNode, request);
-        
-        bool yesExecuted = ResponseStorageHelper.GetResultMap<string>()?.ContainsKey(yesEndNode.NodeId) == true;
-        bool noExecuted = ResponseStorageHelper.GetResultMap<string>()?.ContainsKey(noEndNode.NodeId) == true;
+        var yesEndNode = new EndNode<double, double, bool>("YesEnd", new Response<bool> { Title = "YesEnd" });
+        var noEndNode = new EndNode<double, double, bool>("NoEnd", new Response<bool> { Title = "NoEnd" });
 
-        Assert.Equal(expectedYes, yesExecuted);
-        Assert.Equal(!expectedYes, noExecuted);
+        var decisionNode = new DecisionNode<double, double, bool>(
+            "Decision",
+            request,
+            yesEndNode,
+            noEndNode
+        );
+
+        var evaluator = new DecisionTreeEvaluator(_adapter);
+        var response = evaluator.Evaluate(decisionNode);
+
+        Assert.NotNull(response);
+        Assert.True(response.Result != null);
+
+        if (expectedYes)
+        {
+            Assert.True(response.Result!.Value);
+            Assert.Equal("YesEnd", response.Title);
+        }
+        else
+        {
+            Assert.False(response.Result!.Value);
+            Assert.Equal("NoEnd", response.Title);
+        }
     }
 }

@@ -1,13 +1,9 @@
-using DecisionTreeLib.Enums;
-using DecisionTreeLib.Node;
-using DecisionTreeLib.Response;
+using DecisionTreeLib.Request;
 
-public interface IProcessNode<T> : INode<T>
+namespace DecisionTreeLib.Node;
+
+public interface IProcessNode<TLeft, TRight, TResult> : INode<TLeft, TRight, TResult>
 {
-    string Title { get; set; }
-    string LeftOperandKey { get; }
-    string RightOperandKey { get; }
-    OperatorType Operator { get; }
-    INode<T> NextNode { get; set; }
-    Dictionary<Guid, IResponse<T>> ResultMap { get; set; }
+    IOperationRequest<TLeft, TRight> Request { get; }
+    INode<TLeft, TRight, TResult> NextNode { get; }
 }

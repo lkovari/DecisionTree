@@ -1,92 +1,116 @@
 using DecisionTreeLib.Adapters;
+using DecisionTreeLib.Node;
+using DecisionTreeLib.Response;
 using DecisionTreeLib.Enums;
 using DecisionTreeLib.Helper;
-using DecisionTreeLib.Node;
-using DecisionTreeLib.Request;
-using DecisionTreeLib.Response;
-using DecisionTreeLib.Result;
 
 namespace DecisionTreeLib.Processing;
 
-public class DecisionTreeEvaluator<T>
+public class DecisionTreeEvaluator
 {
-    private readonly IAdapter _adapter;
+    private readonly IAdapter? _adapter;
 
-    public DecisionTreeEvaluator(IAdapter adapter)
+    public DecisionTreeEvaluator(IAdapter? adapter)
     {
         _adapter = adapter;
     }
 
-    public void Initialize()
+    public IResponse<TResult> Evaluate<TLeft, TRight, TResult>(INode<TLeft, TRight, TResult> node, IResponse<TResult> parentResult = null)
     {
-        ResponseStorageHelper.ClearAll();
-    }
-    
-    public void Evaluate(INode<T> node, IRequest<T> request)
-    {
+        _adapter?.Write($"Evaluating Node: {node.Title}");
         switch (node)
         {
-            case ProcessNode<T> processNode:
-            {
-                dynamic left = request.Operands[processNode.LeftOperandKey].Value;
-                dynamic right = request.Operands[processNode.RightOperandKey].Value;
+            case IProcessNode<TLeft, TRight, TResult> processNode:
+                return EvaluateProcessNode(processNode);
 
-                dynamic resultValue = processNode.Operator switch
+            case IDecisionNode<TLeft, TRight, TResult> decisionNode:
+                return EvaluateDecisionNode(decisionNode);
+
+            case EndNode<TLeft, TRight, TResult> endNode:
+                _adapter?.Write($" Reached End Node: {endNode.Title}");
+                var finalResponse = new Response<TResult>
                 {
-                    OperatorType.Add => left + right,
-                    OperatorType.Subtract => left - right,
-                    OperatorType.Multiply => left * right,
-                    OperatorType.Divide => left / right,
-                    _ => throw new InvalidOperationException()
+                    Title = endNode.Title,
+                    Result = parentResult.Result
                 };
 
-                var result = new DecisionTreeLib.Result.Result<T> { Value = resultValue };
-                var response = new DecisionTreeLib.Response.Response<T> { Result = result };
-                
-                ResponseStorageHelper.AddResult(processNode.NodeId, response);
+                endNode.ResultMap[endNode.NodeId] = finalResponse;
 
-                request.Operands[processNode.Title] = new DecisionTreeLib.Data.Data<T>(resultValue);
-                _adapter.Write($"{processNode.Title} = {resultValue}");
+                return finalResponse;
 
-                if (processNode.NextNode != null)
-                    Evaluate(processNode.NextNode, request);
-                break;
-            }
-            case DecisionNode<T> decisionNode:
-            {
-                dynamic value = request.Operands[decisionNode.OperandKey].Value;
-                bool condition = decisionNode.RelationType switch
-                {
-                    RelationType.Equal => value == (dynamic)decisionNode.CompareValue,
-                    RelationType.GreaterThan => value > (dynamic)decisionNode.CompareValue,
-                    RelationType.LessThan => value < (dynamic)decisionNode.CompareValue,
-                    RelationType.GreaterThanOrEqual => value >= (dynamic)decisionNode.CompareValue,
-                    RelationType.LessThanOrEqual => value <= (dynamic)decisionNode.CompareValue,
-                    RelationType.NotEqual => value != (dynamic)decisionNode.CompareValue,
-                    _ => throw new ArgumentOutOfRangeException(nameof(decisionNode.RelationType))
-                };
-
-                var result = new DecisionTreeLib.Result.Result<T> { Value = value };
-                var response = new DecisionTreeLib.Response.Response<T> { Result = result };
-                
-                ResponseStorageHelper.AddResult(decisionNode.NodeId, response);
-
-                _adapter.Write($"{decisionNode.Title}: {condition}");
-
-                if (condition && decisionNode.YesNextNode != null)
-                    Evaluate(decisionNode.YesNextNode, request);
-                else if (!condition && decisionNode.NoNextNode != null)
-                    Evaluate(decisionNode.NoNextNode, request);
-                break;
-            }
-            case EndNode<T> endNode:
-                IResponse<string> endResponse = new Response<string>();
-                endResponse.Result = new Result<string>() { Value = endNode.Title };
-                ResponseStorageHelper.AddResult(endNode.NodeId, endResponse);
-                Console.WriteLine($"End of Processing: {endNode.Title}");
-                break;
             default:
-                throw new ArgumentOutOfRangeException(nameof(node), $"Unknown Node type: {node.GetType().Name}");
+                throw new InvalidOperationException($"Unsupported node type: {node.GetType().Name}");
         }
+    }
+
+    private IResponse<TResult> EvaluateProcessNode<TLeft, TRight, TResult>(IProcessNode<TLeft, TRight, TResult> node)
+    {
+        var left = node.Request.LeftOperand.Value;
+        var right = node.Request.RightOperand.Value;
+        var result = CalculateOperation(left, right, node.Request.Operator);
+        
+        var response = new Response<TResult>
+        {
+            Title = node.Title,
+            Result = new DecisionTreeLib.Result.Result<TResult> { Value = (TResult)Convert.ChangeType(result, typeof(TResult))! }
+        };
+        
+        node.ResultMap[node.NodeId] = response;
+        
+        var mess = ExpressionTextFormatHelperHelper.FormatOperation(
+            left, 
+            node.Request.Operator.ToString(), 
+            right, 
+            result);
+        
+        _adapter.Write($" Processing operation: {mess}");
+        return Evaluate(node.NextNode, response);
+    }
+
+    private IResponse<TResult> EvaluateDecisionNode<TLeft, TRight, TResult>(IDecisionNode<TLeft, TRight, TResult> node)
+    {
+        bool condition = node.Request.Relation switch
+        {
+            RelationType.LessThan => Comparator.Compare(node.Request.LeftOperand, node.Request.RightOperand) < 0,
+            RelationType.LessThanOrEqual => Comparator.Compare(node.Request.LeftOperand, node.Request.RightOperand) <= 0,
+            RelationType.GreaterThan => Comparator.Compare(node.Request.LeftOperand, node.Request.RightOperand) > 0,
+            RelationType.GreaterThanOrEqual => Comparator.Compare(node.Request.LeftOperand, node.Request.RightOperand) >= 0,
+            RelationType.Equal => Equals(node.Request.LeftOperand.Value, node.Request.RightOperand.Value),
+            RelationType.NotEqual => !Equals(node.Request.LeftOperand.Value, node.Request.RightOperand.Value),
+            RelationType.Contains => node.Request.LeftOperand?.ToString()?.Contains(node.Request.RightOperand?.ToString() ?? string.Empty) ?? false,
+            _ => throw new InvalidOperationException($"Unsupported RelationType: {node.Request.Relation}")
+        };
+
+        var response = new Response<TResult>
+        {
+            Title = node.Title,
+            Result = new DecisionTreeLib.Result.Result<TResult> { Value = (TResult)Convert.ChangeType(condition, typeof(TResult))! }
+        };
+        
+        node.ResultMap[node.NodeId] = response;
+
+        var mess = ExpressionTextFormatHelperHelper.FormatRelation(
+            node.Request.LeftOperand.Value, 
+            node.Request.Relation.ToString(), 
+            node.Request.RightOperand.Value, 
+            condition);
+        
+        _adapter?.Write($" Evaluating decision: {mess}");
+        return Evaluate(condition ? node.YesNextNode : node.NoNextNode, response);
+    }
+
+    private object CalculateOperation<TLeft, TRight>(TLeft left, TRight right, OperatorType operationType)
+    {
+        dynamic l = left;
+        dynamic r = right;
+
+        return operationType switch
+        {
+            OperatorType.Add => l + r,
+            OperatorType.Subtract => l - r,
+            OperatorType.Multiply => l * r,
+            OperatorType.Divide => r != 0 ? l / r : throw new DivideByZeroException(),
+            _ => throw new InvalidOperationException($"Unsupported OperatorType: {operationType}")
+        };
     }
 }

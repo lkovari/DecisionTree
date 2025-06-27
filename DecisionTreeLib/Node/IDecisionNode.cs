@@ -1,15 +1,11 @@
-using DecisionTreeLib.Enums;
-using DecisionTreeLib.Response;
+using DecisionTreeLib.Request;
 
 namespace DecisionTreeLib.Node;
 
-public interface IDecisionNode<T> : INode<T>
+public interface IDecisionNode<TLeft, TRight, TResult> : INode<TLeft, TRight, TResult>
 {
-    string Title { get; set; }
-    string OperandKey { get; }
-    T CompareValue { get; }
-    RelationType RelationType { get; }
-    INode<T> YesNextNode { get; set; }
-    INode<T> NoNextNode { get; set; }
-    Dictionary<Guid, IResponse<T>> ResultMap { get; set; }
+    IDecisionRequest<TLeft, TRight> Request { get; }
+    
+    INode<TLeft, TRight, TResult> YesNextNode { get; }
+    INode<TLeft, TRight, TResult> NoNextNode { get; }
 }
