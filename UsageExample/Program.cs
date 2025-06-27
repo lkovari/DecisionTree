@@ -38,14 +38,6 @@ var left5 = new Data<int>(ExpectedResult);
 var right5 = new Data<int>(300);
 var request5 = new DecisionRequest<int, int>(left5, right5, RelationType.Equal);
 
-// EndNode Dummy Request
-// Dummy request for EndNode, required for constructor
-var request = new OperationRequest<int, int>(
-    new Data<int>(0),
-    new Data<int>(0),
-    OperatorType.Add
-);
-
 var yesEndNode = new EndNode<int, int, int>(
     "Yes End",
     new Response<int> { Title = "Yes", Result = new DecisionTreeLib.Result.Result<int> { Value = 300 } }
@@ -61,7 +53,6 @@ var processNode3 = new ProcessNode<int, int, int>("Multiply", request3, processN
 var processNode2 = new ProcessNode<int, int, int>("Divide", request2, processNode3);
 var processNode1 = new ProcessNode<int, int, int>("Subtract", request1, processNode2);
 
-// Evaluator
 var adapter = new ConsoleAdapter();
 var evaluator = new DecisionTreeEvaluator(adapter);
 evaluator.Evaluate<int, int, int>(processNode1);

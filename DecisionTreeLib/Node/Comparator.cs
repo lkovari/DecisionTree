@@ -18,16 +18,14 @@ public static class Comparator
 
         Type leftType = leftValue.GetType();
         Type rightType = rightValue.GetType();
-
-        // Numeric comparison
+        
         if (IsNumeric(leftType) && IsNumeric(rightType))
         {
             double leftNum = Convert.ToDouble(leftValue);
             double rightNum = Convert.ToDouble(rightValue);
             return leftNum.CompareTo(rightNum);
         }
-
-        // String comparison
+        
         if (leftValue is string leftStr && rightValue is string rightStr)
         {
             return string.Compare(leftStr, rightStr, StringComparison.Ordinal);

@@ -1,8 +1,7 @@
 using DecisionTreeLib.Enums;
+using DecisionTreeLib.Data;
 
 namespace DecisionTreeLib.Request;
-
-using DecisionTreeLib.Data;
 
 public class DecisionRequest<TLeft, TRight> : IDecisionRequest<TLeft, TRight>
 {
