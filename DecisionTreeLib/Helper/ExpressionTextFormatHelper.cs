@@ -1,6 +1,6 @@
 namespace DecisionTreeLib.Helper;
 
-public static class ExpressionTextFormatHelperHelper
+public static class ExpressionTextFormatHelper
 {
     public static string FormatOperation(object leftOperand, string operation, object rightOperand, object result)
     {

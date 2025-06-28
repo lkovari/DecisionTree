@@ -1,8 +1,8 @@
 ﻿using DecisionTreeLib.Adapters;
 using DecisionTreeLib.Data;
 using DecisionTreeLib.Enums;
+using DecisionTreeLib.Evaluator;
 using DecisionTreeLib.Node;
-using DecisionTreeLib.Processing;
 using DecisionTreeLib.Request;
 using DecisionTreeLib.Response;
 using Xunit;
@@ -18,7 +18,7 @@ public class ProcessAndDecisionNodeTests
     [InlineData(5, 3, OperatorType.Subtract, 2)]
     [InlineData(5, 3, OperatorType.Multiply, 15)]
     [InlineData(6, 3, OperatorType.Divide, 2)]
-    public void ProcessNode_Should_Perform_Arithmetic_Correctly(double left, double right, OperatorType op, double expected)
+    public void CalculationNode_Should_Perform_Arithmetic_Correctly_Tests(double left, double right, OperatorType op, double expected)
     {
         var request = new OperationRequest<double, double>(
             new Data<double>(left),
@@ -28,10 +28,10 @@ public class ProcessAndDecisionNodeTests
 
         var endNode = new EndNode<double, double, double>("End", new Response<double> { Title = "End" });
 
-        var processNode = new ProcessNode<double, double, double>("Process", request, endNode);
+        var CalculationNode = new CalculationNode<double, double, double>("Process", request, endNode);
 
         var evaluator = new DecisionTreeEvaluator(_adapter);
-        var response = evaluator.Evaluate(processNode);
+        var response = evaluator.Evaluate(CalculationNode);
 
         Assert.NotNull(response?.Result);
         Assert.Equal(expected, response.Result!.Value);
@@ -46,7 +46,7 @@ public class ProcessAndDecisionNodeTests
     [InlineData(3, 5, RelationType.LessThanOrEqual, true)]
     [InlineData(3, 3, RelationType.LessThanOrEqual, true)]
     [InlineData(3, 5, RelationType.NotEqual, true)]
-    public void DecisionNode_Should_Evaluate_Condition_Correctly(double left, double right, RelationType relation, bool expectedYes)
+    public void DecisionNode_Should_Evaluate_Condition_Correctly_Tests(double left, double right, RelationType relation, bool expectedYes)
     {
         var request = new DecisionRequest<double, double>(
             new Data<double>(left),

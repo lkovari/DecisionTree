@@ -16,8 +16,8 @@ public static class Comparator
         if (rightValue is null)
             return 1;
 
-        Type leftType = leftValue.GetType();
-        Type rightType = rightValue.GetType();
+        var leftType = leftValue.GetType();
+        var rightType = rightValue.GetType();
         
         if (IsNumeric(leftType) && IsNumeric(rightType))
         {

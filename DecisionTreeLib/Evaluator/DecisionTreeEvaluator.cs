@@ -1,10 +1,10 @@
 using DecisionTreeLib.Adapters;
-using DecisionTreeLib.Node;
-using DecisionTreeLib.Response;
 using DecisionTreeLib.Enums;
 using DecisionTreeLib.Helper;
+using DecisionTreeLib.Node;
+using DecisionTreeLib.Response;
 
-namespace DecisionTreeLib.Processing;
+namespace DecisionTreeLib.Evaluator;
 
 public class DecisionTreeEvaluator
 {
@@ -17,11 +17,11 @@ public class DecisionTreeEvaluator
 
     public IResponse<TResult> Evaluate<TLeft, TRight, TResult>(INode<TLeft, TRight, TResult> node, IResponse<TResult> parentResult = null)
     {
-        _adapter?.Write($"Evaluating Node: {node.Title}");
+        _adapter?.Write($"Evaluating {node.Title}");
         switch (node)
         {
-            case IProcessNode<TLeft, TRight, TResult> processNode:
-                return EvaluateProcessNode(processNode);
+            case ICalculationNode<TLeft, TRight, TResult> CalculationNode:
+                return EvaluateCalculationNode(CalculationNode);
 
             case IDecisionNode<TLeft, TRight, TResult> decisionNode:
                 return EvaluateDecisionNode(decisionNode);
@@ -43,7 +43,7 @@ public class DecisionTreeEvaluator
         }
     }
 
-    private IResponse<TResult> EvaluateProcessNode<TLeft, TRight, TResult>(IProcessNode<TLeft, TRight, TResult> node)
+    private IResponse<TResult> EvaluateCalculationNode<TLeft, TRight, TResult>(ICalculationNode<TLeft, TRight, TResult> node)
     {
         var left = node.Request.LeftOperand.Value;
         var right = node.Request.RightOperand.Value;
@@ -57,13 +57,13 @@ public class DecisionTreeEvaluator
         
         node.ResultMap[node.NodeId] = response;
         
-        var mess = ExpressionTextFormatHelperHelper.FormatOperation(
+        var mess = ExpressionTextFormatHelper.FormatOperation(
             left, 
-            node.Request.Operator.ToString(), 
+            "" + (char)node.Request.Operator, 
             right, 
             result);
         
-        _adapter.Write($" Processing operation: {mess}");
+        _adapter.Write($" Evaluator operation: {mess}");
         return Evaluate(node.NextNode, response);
     }
 
@@ -89,7 +89,7 @@ public class DecisionTreeEvaluator
         
         node.ResultMap[node.NodeId] = response;
 
-        var mess = ExpressionTextFormatHelperHelper.FormatRelation(
+        var mess = ExpressionTextFormatHelper.FormatRelation(
             node.Request.LeftOperand.Value, 
             node.Request.Relation.ToString(), 
             node.Request.RightOperand.Value, 
