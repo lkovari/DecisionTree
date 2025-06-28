@@ -1,6 +1,6 @@
 Decision Tree basic implementation with tiny usage example and tests. 
 (draft version)
-- arithmetic operations covered by ProcessNode
+- arithmetic operations covered by CalculationNode
 - standard relations covered by DecisionNode
   
 Future:
