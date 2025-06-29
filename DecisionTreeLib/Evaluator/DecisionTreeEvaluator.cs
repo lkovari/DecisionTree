@@ -3,6 +3,7 @@ using DecisionTreeLib.Enums;
 using DecisionTreeLib.Helper;
 using DecisionTreeLib.Node;
 using DecisionTreeLib.Response;
+using DecisionTreeLib.Validators;
 
 namespace DecisionTreeLib.Evaluator;
 
@@ -20,8 +21,11 @@ public class DecisionTreeEvaluator
         _adapter?.Write($"Evaluating {node.Title}");
         switch (node)
         {
-            case ICalculationNode<TLeft, TRight, TResult> CalculationNode:
-                return EvaluateCalculationNode(CalculationNode);
+            case ICalculationNode<TLeft, TRight, TResult> calculationNode:
+            {
+                OperandTypeValidator.ValidateArithmeticOperands(calculationNode.Request.LeftOperand, calculationNode.Request.RightOperand);
+                return EvaluateCalculationNode(calculationNode);
+            }
 
             case IDecisionNode<TLeft, TRight, TResult> decisionNode:
                 return EvaluateDecisionNode(decisionNode);
