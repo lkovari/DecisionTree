@@ -14,11 +14,11 @@ public class DecisionNodeTests
         var request = new DecisionRequest<int, int>(new Data<int>(1), new Data<int>(2), RelationType.Equal);
         var yesNode = new EndNode<int, int, int>("Yes", result: new DecisionTreeLib.Response.Response<int>
         {
-            Title = null
+            Title = ""
         });
         var noNode = new EndNode<int, int, int>("No", result: new DecisionTreeLib.Response.Response<int>
         {
-            Title = null
+            Title = ""
         });
         var node = new DecisionNode<int, int, int>("Decision", request, yesNode, noNode);
 
@@ -34,17 +34,17 @@ public class DecisionNodeTests
         var request = new DecisionRequest<int, int>(new Data<int>(1), new Data<int>(2), RelationType.Equal);
         var yesNode = new EndNode<int, int, int>("Yes", result: new DecisionTreeLib.Response.Response<int>
         {
-            Title = null
+            Title = ""
         });
         var noNode = new EndNode<int, int, int>("No", result: new DecisionTreeLib.Response.Response<int>
         {
-            Title = null
+            Title = ""
         });
         var node = new DecisionNode<int, int, int>("Decision", request, yesNode, noNode);
 
         var response = new DecisionTreeLib.Response.Response<int>
         {
-            Title = null
+            Title = ""
         };
         node.ResultMap[node.NodeId] = response;
         Assert.Equal(response, node.ResultMap[node.NodeId]);

@@ -14,7 +14,7 @@ public class CalculationNodeTests
         var request = new OperationRequest<int, int>(new Data<int>(1), new Data<int>(2), DecisionTreeLib.Enums.OperatorType.Add);
         var endNode = new EndNode<int, int, int>("End", new DecisionTreeLib.Response.Response<int>
         {
-            Title = null
+            Title = ""
         });
         var node = new CalculationNode<int, int, int>("Calc", request, endNode);
 
@@ -29,13 +29,13 @@ public class CalculationNodeTests
         var request = new OperationRequest<int, int>(new Data<int>(1), new Data<int>(2), DecisionTreeLib.Enums.OperatorType.Add);
         var endNode = new EndNode<int, int, int>("End", new DecisionTreeLib.Response.Response<int>
         {
-            Title = null
+            Title = ""
         });
         var node = new CalculationNode<int, int, int>("Calc", request, endNode);
 
         var response = new DecisionTreeLib.Response.Response<int>
         {
-            Title = null
+            Title = ""
         };
         node.ResultMap[node.NodeId] = response;
         Assert.Equal(response, node.ResultMap[node.NodeId]);
