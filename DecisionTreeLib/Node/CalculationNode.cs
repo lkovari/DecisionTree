@@ -51,6 +51,7 @@ public class CalculationNode<TLeft, TRight, TResult> : IBinaryCalculationNode<TL
         return evaluator.Evaluate(NextNode, response);
     }
 
+    // WARNING: Using dynamic disables compile-time type safety. Only use for numeric types.
     private object CalculateOperation(object left, object right, OperatorType operationType)
     {
         dynamic l = left;
