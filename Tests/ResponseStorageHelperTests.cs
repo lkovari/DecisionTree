@@ -42,8 +42,18 @@ public class ResponseStorageHelperTests
         var endNodeResponse = new Response<int> { Title = ExpectedEndResultTitle, Result = new Result<int> { Value = ExpectedEndNodeResponseValue } };
         var endNode = new EndNode<int, int, int>("End", endNodeResponse);
         
-        var request1 = new OperationRequest<int, int>(new Data<int>(2), new Data<int>(3), OperatorType.Add);
-        var request2 = new OperationRequest<int, int>(new Data<int>(4), new Data<int>(5), OperatorType.Multiply);
+        var request1 = new BinaryOperationRequest<int, int>
+        {
+            LeftOperand = new Data<int>(2),
+            RightOperand = new Data<int>(3),
+            Operator = OperatorType.Add
+        };
+        var request2 = new BinaryOperationRequest<int, int>
+        {
+            LeftOperand = new Data<int>(4),
+            RightOperand = new Data<int>(5),
+            Operator = OperatorType.Multiply
+        };
         
         var calculationNode2 = new CalculationNode<int, int, int>("Multiply", request2, endNode);
         var calculationNode1 = new CalculationNode<int, int, int>("Add", request1, calculationNode2);
@@ -122,7 +132,12 @@ public class ResponseStorageHelperTests
         var decisionRequest = new DecisionRequest<int, int>(new Data<int>(10), new Data<int>(5), RelationType.GreaterThan);
         var decisionNode = new DecisionNode<int, int, int>("Decision", decisionRequest, endNodeYes, endNodeNo);
 
-        var processRequest = new OperationRequest<int, int>(new Data<int>(2), new Data<int>(3), OperatorType.Add);
+        var processRequest = new BinaryOperationRequest<int, int>
+        {
+            LeftOperand = new Data<int>(2),
+            RightOperand = new Data<int>(3),
+            Operator = OperatorType.Add
+        };
         var calculationNode = new CalculationNode<int, int, int>("Add", processRequest, decisionNode);
 
         var nodeIdProcess = calculationNode.NodeId;

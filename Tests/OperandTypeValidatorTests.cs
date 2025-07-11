@@ -60,8 +60,7 @@ public class OperandTypeValidatorTests
         Assert.Throws<InvalidOperandTypeException>(() =>
             OperandTypeValidator.ValidateArithmeticOperands(left, right));
     }
-
-    // Null operand tests
+    
     [Fact]
     public void ValidateBitwiseOperands_NullLeft_ThrowsArgumentNullException()
     {
@@ -93,8 +92,7 @@ public class OperandTypeValidatorTests
         IData<int>? right = null;
         Assert.Throws<ArgumentNullException>(() => OperandTypeValidator.ValidateArithmeticOperands(left, right));
     }
-
-    // All supported types for bitwise
+    
     [Theory]
     [InlineData(typeof(byte))]
     [InlineData(typeof(ushort))]
@@ -113,8 +111,7 @@ public class OperandTypeValidatorTests
         var right = new Data<T>((T)Convert.ChangeType(2, typeof(T)));
         OperandTypeValidator.ValidateBitwiseOperands(left, right);
     }
-
-    // All supported types for arithmetic
+    
     [Theory]
     [InlineData(typeof(byte))]
     [InlineData(typeof(ushort))]
@@ -140,8 +137,7 @@ public class OperandTypeValidatorTests
         var right = new Data<T>((T)Convert.ChangeType(2, typeof(T)));
         OperandTypeValidator.ValidateArithmeticOperands(left, right);
     }
-
-    // Unsupported type for bitwise
+    
     [Fact]
     public void ValidateBitwiseOperands_UnsupportedType_Throws()
     {
@@ -149,8 +145,7 @@ public class OperandTypeValidatorTests
         var right = new Data<string>("b");
         Assert.Throws<InvalidOperandTypeException>(() => OperandTypeValidator.ValidateBitwiseOperands(left, right));
     }
-
-    // Unsupported type for arithmetic
+    
     [Fact]
     public void ValidateArithmeticOperands_UnsupportedType_Throws()
     {

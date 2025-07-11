@@ -11,26 +11,46 @@ Console.WriteLine("Hello, Decision Tree Usage Example!");
 Console.WriteLine();
 const int expectedResult = 300;
 
-// (52 - 2) * (24 / 8) * 2
+// (52 - 2) * (24 / 8) * 2 if result is 300 go to yes node
 
 // 52 - 2
 var left1 = new Data<int>(52);
 var right1 = new Data<int>(2);
-var request1 = new OperationRequest<int, int>(left1, right1, OperatorType.Subtract);
+var request1 = new BinaryOperationRequest<int, int>
+{
+    LeftOperand = left1,
+    RightOperand = right1,
+    Operator = OperatorType.Subtract
+};
 
 // 24 / 8
 var left2 = new Data<int>(24);
 var right2 = new Data<int>(8);
-var request2 = new OperationRequest<int, int>(left2, right2, OperatorType.Divide);
+var request2 = new BinaryOperationRequest<int, int>
+{
+    LeftOperand = left2,
+    RightOperand = right2,
+    Operator = OperatorType.Divide
+};
 
 var left3 = new Data<int>(50);
 var right3 = new Data<int>(3);
-var request3 = new OperationRequest<int, int>(left3, right3, OperatorType.Multiply);
+var request3 = new BinaryOperationRequest<int, int>
+{
+    LeftOperand = left3,
+    RightOperand = right3,
+    Operator = OperatorType.Multiply
+};
 
 // result3 * 2
 var left4 = new Data<int>(150);
 var right4 = new Data<int>(2);
-var request4 = new OperationRequest<int, int>(left4, right4, OperatorType.Multiply);
+var request4 = new BinaryOperationRequest<int, int>
+{
+    LeftOperand = left4,
+    RightOperand = right4,
+    Operator = OperatorType.Multiply
+};
 
 var left5 = new Data<int>(expectedResult);
 var right5 = new Data<int>(300);

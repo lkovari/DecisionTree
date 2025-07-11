@@ -20,11 +20,12 @@ public class ProcessAndDecisionNodeTests
     [InlineData(6, 3, OperatorType.Divide, 2)]
     public void CalculationNode_Should_Perform_Arithmetic_Correctly_Tests(double left, double right, OperatorType op, double expected)
     {
-        var request = new OperationRequest<double, double>(
-            new Data<double>(left),
-            new Data<double>(right),
-            op
-        );
+        var request = new BinaryOperationRequest<double, double>
+        {
+            LeftOperand = new Data<double>(left),
+            RightOperand = new Data<double>(right),
+            Operator = op
+        };
 
         var endNode = new EndNode<double, double, double>("End", new Response<double> { Title = "End" });
 

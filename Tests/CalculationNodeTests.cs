@@ -11,7 +11,12 @@ public class CalculationNodeTests
     [Fact]
     public void CalculationNode_StoresProperties()
     {
-        var request = new OperationRequest<int, int>(new Data<int>(1), new Data<int>(2), DecisionTreeLib.Enums.OperatorType.Add);
+        var request = new BinaryOperationRequest<int, int>
+        {
+            LeftOperand = new Data<int>(1),
+            RightOperand = new Data<int>(2),
+            Operator = DecisionTreeLib.Enums.OperatorType.Add
+        };
         var endNode = new EndNode<int, int, int>("End", new DecisionTreeLib.Response.Response<int>
         {
             Title = ""
@@ -26,7 +31,12 @@ public class CalculationNodeTests
     [Fact]
     public void CalculationNode_ResultMap_CanAddAndRetrieve()
     {
-        var request = new OperationRequest<int, int>(new Data<int>(1), new Data<int>(2), DecisionTreeLib.Enums.OperatorType.Add);
+        var request = new BinaryOperationRequest<int, int>
+        {
+            LeftOperand = new Data<int>(1),
+            RightOperand = new Data<int>(2),
+            Operator = DecisionTreeLib.Enums.OperatorType.Add
+        };
         var endNode = new EndNode<int, int, int>("End", new DecisionTreeLib.Response.Response<int>
         {
             Title = ""

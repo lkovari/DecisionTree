@@ -5,5 +5,11 @@ public enum OperatorType
     Add = '+', 
     Subtract = '-', 
     Multiply = '*', 
-    Divide = '/'
+    Divide = '/',
+    And,
+    Or,
+    Not,
+    Xor,
+    Nand,
+    Nor
 }
