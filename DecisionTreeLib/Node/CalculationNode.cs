@@ -26,7 +26,14 @@ public class CalculationNode<TLeft, TRight, TResult> : IBinaryCalculationNode<TL
 
     public IResponse<TResult> Execute(DecisionTreeEvaluator evaluator, IResponse<TResult>? parentResult = null)
     {
-        OperandTypeValidator.ValidateArithmeticOperands(Request.LeftOperand, Request.RightOperand);
+        if (IsLogicalOperation(Request.Operator))
+        {
+            OperandTypeValidator.ValidateBitwiseOperands(Request.LeftOperand, Request.RightOperand);
+        }
+        else
+        {
+            OperandTypeValidator.ValidateArithmeticOperands(Request.LeftOperand, Request.RightOperand);
+        }
         
         var left = Request.LeftOperand.Value;
         var right = Request.RightOperand.Value;
@@ -63,7 +70,25 @@ public class CalculationNode<TLeft, TRight, TResult> : IBinaryCalculationNode<TL
             OperatorType.Subtract => l - r,
             OperatorType.Multiply => l * r,
             OperatorType.Divide => r != 0 ? l / r : throw new DivideByZeroException(),
+            OperatorType.And => l & r,
+            OperatorType.Or => l | r,
+            OperatorType.Xor => l ^ r,
+            OperatorType.Not => ~l,
+            OperatorType.Nand => ~(l & r),
+            OperatorType.Nor => ~(l | r),
             _ => throw new InvalidOperationException($"Unsupported OperatorType: {operationType}")
         };
     }
+
+    private static bool IsLogicalOperation(OperatorType operationType) =>
+        operationType switch
+        {
+            OperatorType.And => true,
+            OperatorType.Or => true,
+            OperatorType.Xor => true,
+            OperatorType.Not => true,
+            OperatorType.Nand => true,
+            OperatorType.Nor => true,
+            _ => false
+        };
 }

@@ -19,7 +19,7 @@ public class OperandTypeValidatorTests
     [Fact]
     public void ValidateBitwiseOperands_InvalidLeftType_Throws()
     {
-        var left = new Data<int>(1);
+        var left = new Data<string>("invalid");
         var right = new Data<byte>(2);
         Assert.Throws<InvalidOperandTypeException>(() =>
             OperandTypeValidator.ValidateBitwiseOperands(left, right));
@@ -29,7 +29,7 @@ public class OperandTypeValidatorTests
     public void ValidateBitwiseOperands_InvalidRightType_Throws()
     {
         var left = new Data<byte>(1);
-        var right = new Data<int>(2);
+        var right = new Data<float>(2.5f);
         Assert.Throws<InvalidOperandTypeException>(() =>
             OperandTypeValidator.ValidateBitwiseOperands(left, right));
     }
@@ -98,6 +98,10 @@ public class OperandTypeValidatorTests
     [InlineData(typeof(ushort))]
     [InlineData(typeof(uint))]
     [InlineData(typeof(ulong))]
+    [InlineData(typeof(sbyte))]
+    [InlineData(typeof(short))]
+    [InlineData(typeof(int))]
+    [InlineData(typeof(long))]
     public void ValidateBitwiseOperands_SupportedTypes_DoesNotThrow(Type type)
     {
         var method = typeof(OperandTypeValidatorTests).GetMethod(nameof(ValidateBitwiseOperands_SupportedTypeHelper), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)!;

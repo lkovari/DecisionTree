@@ -11,6 +11,7 @@ TODOs:
 - implement LogicalNode to doing logical operation between proper data types
 - get a rid of the switch in evaluator create execution for each node type
 - eliminate dynamic and switch in evaluator (The built-in arithmetic operations of .NET (e.g., +, -) only work generically between identical types or with explicit conversion.)
-
+- create builder for nodes
+- 
 Completed:
 - get a rid of the switch in evaluator create execution for each node type

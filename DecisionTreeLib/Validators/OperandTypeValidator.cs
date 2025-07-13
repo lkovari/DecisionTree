@@ -33,7 +33,8 @@ public static class OperandTypeValidator
     }
 
     private static bool IsBitwiseCompatible(Type type) =>
-        type == typeof(byte) || type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong);
+        type == typeof(byte) || type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong) ||
+        type == typeof(sbyte) || type == typeof(short) || type == typeof(int) || type == typeof(long);
 
     private static bool IsArithmeticCompatible(Type type) =>
         type == typeof(byte) || type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong) ||
