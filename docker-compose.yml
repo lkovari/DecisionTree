@@ -1,0 +1,6 @@
+﻿services:
+  decisiontreelibapi:
+    image: decisiontreelibapi
+    build:
+      context: .
+      dockerfile: DecisionTreeLibApi/Dockerfile

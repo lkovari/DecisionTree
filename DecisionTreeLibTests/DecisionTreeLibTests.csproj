@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DecisionTreeLib\DecisionTreeLib.csproj" />
+        <ProjectReference Include="..\DecisionTreeLib\DecisionTreeLib.csproj"/>
     </ItemGroup>
 
 </Project>

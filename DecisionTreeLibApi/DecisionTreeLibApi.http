@@ -1,0 +1,6 @@
+@DecisionTreeLibApi_HostAddress = http://localhost:5197
+
+GET {{DecisionTreeLibApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
